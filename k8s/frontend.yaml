@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: frontend
 spec:
-  replicas: 2  # Haute Disponibilité répartie sur les Workers
+  replicas: 2  # HA sur les Workers
   selector:
     matchLabels:
       app: frontend
@@ -14,7 +14,6 @@ spec:
     spec:
       containers:
       - name: frontend
-        # Na77ina v37 w raddineha :latest bch dima yjib el jdid
         image: 192.168.56.20:5000/mon-app-frontend:latest
         imagePullPolicy: Always
         ports:
@@ -32,4 +31,4 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-      nodePort: 30001  # Port mta3 el browser lel interface CloudShield
+      nodePort: 30001  
