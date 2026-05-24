@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: frontend
 spec:
-  replicas: 1
+  replicas: 2  # 1️⃣ On passe à 2 répliques comme sur ton schéma
   selector:
     matchLabels:
       app: frontend
@@ -12,7 +12,7 @@ spec:
       labels:
         app: frontend
     spec:
-      nodeName: worker2
+      # 2️⃣ ON SUPPRIME "nodeName: worker2" pour laisser K8s répartir sur Worker 1 et Worker 2
       containers:
       - name: frontend
         image: 192.168.56.20:5000/mon-app-frontend:v37 
