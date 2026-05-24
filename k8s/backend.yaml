@@ -12,23 +12,25 @@ spec:
       labels:
         app: backend
     spec:
-      nodeName: worker2
       containers:
       - name: backend
-        image: 192.168.56.20:5000/mon-app-backend:v37 # Mise à jour v37
+        image: 192.168.56.20:5000/mon-app-backend:v37 
         ports:
         - containerPort: 5000
+        env:
+        - name: DB_NAME      
+          value: "k8s_db"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: backend-service
 spec:
-  type: NodePort # Obligatoire pour Windows -> K8s
+  type: NodePort 
   selector:
     app: backend
   ports:
     - protocol: TCP
       port: 5000
       targetPort: 5000
-      nodePort: 32001 
+      nodePort: 32001
