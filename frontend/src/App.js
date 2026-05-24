@@ -4,12 +4,38 @@ import axios from 'axios';
 function App() {
   const [status, setStatus] = useState("Checking...");
   const [users, setUsers] = useState([]);
+  
+  // États pour le formulaire de saisie
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  
   const API_BASE = "http://app.pfe:32403";
+
+  // Fonction pour charger les utilisateurs
+  const fetchUsers = () => {
+    axios.get(`${API_BASE}/api/users`).then(res => setUsers(res.data)).catch(() => console.log("DB Error"));
+  };
 
   useEffect(() => {
     axios.get(`${API_BASE}/health`).then(res => setStatus(res.data.status)).catch(() => setStatus("OFFLINE"));
-    axios.get(`${API_BASE}/api/users`).then(res => setUsers(res.data)).catch(() => console.log("DB Error"));
+    fetchUsers();
   }, []);
+
+  // Fonction déclenchée lors de la soumission du formulaire
+  const handleAddUser = (e) => {
+    e.preventDefault();
+    if (!name || !email) return alert("Veuillez remplir tous les champs !");
+
+    axios.post(`${API_BASE}/api/users`, { name, email })
+      .then(res => {
+        // Ajouter le nouvel utilisateur à la liste affichée sans recharger la page
+        setUsers([...users, res.data]);
+        // Vider les champs du formulaire
+        setName("");
+        setEmail("");
+      })
+      .catch(err => alert("Erreur lors de l'ajout de l'utilisateur"));
+  };
 
   return (
     <div style={s.body}>
@@ -41,6 +67,28 @@ function App() {
           <div style={s.statCard}><h3>K8s</h3><p>Orchestration</p></div>
         </div>
 
+        {/* Formulaire d'ajout (Nouveau bloc pour la démo) */}
+        <div style={s.formContainer}>
+          <h3 style={{marginTop: 0, marginBottom: '15px', color: '#1e293b'}}>➕ Enregistrer un nouvel opérateur</h3>
+          <form onSubmit={handleAddUser} style={s.form}>
+            <input 
+              type="text" 
+              placeholder="Nom complet" 
+              value={name} 
+              onChange={(e) => setName(e.target.value)} 
+              style={s.input} 
+            />
+            <input 
+              type="email" 
+              placeholder="Adresse Email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              style={s.input} 
+            />
+            <button type="submit" style={s.button}>Créer l'accès</button>
+          </form>
+        </div>
+
         {/* Users Table */}
         <div style={s.tableContainer}>
           <table style={s.table}>
@@ -57,7 +105,7 @@ function App() {
                 <tr key={u.id} style={s.tr}>
                   <td style={s.td}>
                     <div style={s.userCell}>
-                      <div style={s.avatar}>{u.name.charAt(0)}</div>
+                      <div style={s.avatar}>{u.name ? u.name.charAt(0) : '?'}</div>
                       <span style={{fontWeight:'600'}}>{u.name}</span>
                     </div>
                   </td>
@@ -88,6 +136,13 @@ const s = {
   dot: { width: '10px', height: '10px', borderRadius: '50%', marginRight: '10px' },
   statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '40px' },
   statCard: { backgroundColor: 'white', padding: '20px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' },
+  
+  // Nouveaux styles pour le formulaire
+  formContainer: { backgroundColor: 'white', padding: '25px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', marginBottom: '30px' },
+  form: { display: 'flex', gap: '15px' },
+  input: { flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', outline: 'none' },
+  button: { padding: '12px 24px', backgroundColor: '#38bdf8', color: '#0f172a', border: 'none', borderRadius: '8px', fontWeight: '700', cursor: 'pointer', transition: 'background 0.2s' },
+  
   tableContainer: { backgroundColor: 'white', borderRadius: '16px', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', overflow: 'hidden' },
   table: { width: '100%', borderCollapse: 'collapse', textAlign: 'left' },
   trHead: { backgroundColor: '#f1f5f9' },
