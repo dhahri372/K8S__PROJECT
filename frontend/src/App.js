@@ -9,8 +9,7 @@ function App() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   
-  const API_BASE = "http://app.pfe:32403";
-
+  const API_BASE = "http://192.168.56.12:32001";
   // Fonction pour charger les utilisateurs
   const fetchUsers = () => {
     axios.get(`${API_BASE}/api/users`).then(res => setUsers(res.data)).catch(() => console.log("DB Error"));
